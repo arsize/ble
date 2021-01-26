@@ -1,4 +1,5 @@
 import errToString from "./error"
+const tools = require("./tools")
 
 const PRINT_SHOW = true //开启流程展示
 
@@ -21,12 +22,7 @@ class BLE {
         }
         showline(`初始化成功！`)
 
-        let [search_err, search] = await _startSearch.call(this)
-        if (search_err != null) {
-            showline(`搜寻设备失败!${search_err}`)
-            return
-        }
-        showline(`搜索成功，得到结果`, search)
+        _startSearch.call(this)
     }
 }
 
@@ -45,22 +41,15 @@ function _openAdapter() {
  */
 function _startSearch() {
     showline(`准备搜寻附近的蓝牙外围设备...`)
-    return promisify("wx.startBluetoothDevicesDiscovery", {
-        services: [this.uuid]
-    }).then(
-        res => [null, res],
-        err => [err, null]
-    )
+    return tools.promisify(wx.startBluetoothDevicesDiscovery, {
+        services: [this.uuid],
+    }).then(res => {
+        console.log('ok')
+    }, err => {
+        console.log('not ok', err)
+    })
 }
-function promisify(fn, args) {
-    return new Promise((resolve, reject) => {
-        fn({
-            ...(args || {}),
-            success: res => resolve(res),
-            fail: err => reject(err)
-        });
-    });
-}
+
 
 function showline(str) {
     PRINT_SHOW ? console.log(str) : null
