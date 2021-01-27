@@ -1,4 +1,4 @@
-import * as mod from "./mod";
+import BLEHandler from "./bleHandler"
 
 /**
  * 蓝牙连接流程：
@@ -10,31 +10,29 @@ import * as mod from "./mod";
  * 6.激活特征值
  */
 
-class BLE {
+class BLE extends BLEHandler {
     constructor(blename) {
-        this.readCharacteristicId = "";
-        this.writeCharacteristicId = "";
-        this.notifyCharacteristicId = "";
-        this.deviceId = "";
-        this.blename = blename;
-        this.serviceId = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E";
+        super(blename)
     }
     async init() {
         // 蓝牙适配器初始化
-        await mod.openAdapter.call(this);
+        await this.openAdapter()
         // 搜索蓝牙设备
-        await mod.startSearch.call(this);
+        await this.startSearch()
         // 获取设备ID
-        await mod.onBluetoothFound.call(this);
+        await this.onBluetoothFound()
         // 停止搜索设备
-        await mod.stopSearchBluetooth.call(this);
+        await this.stopSearchBluetooth()
         // // 连接蓝牙
-        // connectBlue();
+        await this.connectBlue();
         // // 获取特征值
-        // getCharacteristics();
+        await this.getCharacteristics();
     }
-    async send() {}
-    async clear() {}
+    async send() { }
+    async close() {
+        await this.closeBLEConnection()
+
+    }
 }
 
 export { BLE };
