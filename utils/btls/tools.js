@@ -83,7 +83,7 @@ function _connectBlue() {
         deviceId: this.deviceId,
     }).then(
         (res) => {
-            print(`✔连接蓝牙成功！`);
+            print(`✔ 连接蓝牙成功！`);
             return [null, res]
         },
         (err) => {
@@ -121,7 +121,7 @@ function _closeBLEAdapter() {
 }
 
 function _getBLEServices() {
-    print(`获取蓝牙设备所有服务(service)`)
+    print(`获取蓝牙设备所有服务...`)
     return promisify(wx.getBLEDeviceServices, {
         deviceId: this.deviceId
     }).then(res => {
