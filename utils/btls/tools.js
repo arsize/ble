@@ -10,7 +10,7 @@ function _openAdapter() {
             return [null, res]
         },
         (err) => {
-            print(`x 初始化失败！${errToString(err)}`);
+            print(`✘ 初始化失败！${errToString(err)}`);
             return [errToString(err), null]
         }
     );
@@ -18,12 +18,12 @@ function _openAdapter() {
 
 /**
  * @param {Array<string>} services
+ * @param { Int } interval
  */
 function _startSearch() {
     print(`准备搜寻附近的蓝牙外围设备...`);
-    console.log('this.serviceId', this.serviceId)
     return promisify(wx.startBluetoothDevicesDiscovery, {
-        interval: 1
+        interval: 1000
     }).then(
         (res) => {
             print(`✔ 搜索成功!`);
@@ -31,31 +31,33 @@ function _startSearch() {
 
         },
         (err) => {
-            print(`x 搜索蓝牙设备失败！${errToString(err)}`);
+            print(`✘ 搜索蓝牙设备失败！${errToString(err)}`);
             return [errToString(err), null]
         }
     );
 }
 
 /**
- *
+ *@param {Array<string>} devices
+ *@deviceId 设备ID
  */
 function _onBluetoothFound() {
     print(`准备监听寻找到新设备的事件...`);
     return promisify_callback(wx.onBluetoothDeviceFound).then(
         (res) => {
-            let device = res.devices[0];
-            console.log('devices', res.devices)
-            console.log(this.blename)
-            console.log(device.name == this.blename)
-            console.log(device.localName == this.blename)
-            if ((device.name && device.name == this.blename) || (device.localName && device.localName == this.blename)) {
-                this.deviceId = device.deviceId;
-            }
-            return [null, res]
+            let devices = res.devices
+            devices.forEach(element => {
+                if ((element.name && element.name == this.blename) || (element.localName && element.localName == this.blename)) {
+                    this.deviceId = element.deviceId
+                    console.log('this.deviceId', this.deviceId)
+                    return [null, res]
+                }
+            });
+            return ['找不到设备', null]
+
         },
         (err) => {
-            print(`x 获取deviceid失败！${errToString(err)}`);
+            print(`✘ 获取deviceid失败！${errToString(err)}`);
             return [errToString(err), null]
         }
     );
@@ -69,15 +71,12 @@ function _stopSearchBluetooth() {
             return [null, res]
         },
         (err) => {
-            print(`x 停止查询设备失败！${errToString(err)}`);
+            print(`✘ 停止查询设备失败！${errToString(err)}`);
             return [errToString(err), null]
         }
     );
 }
 
-/**
- *
- */
 function _connectBlue() {
     print(`准备连接设备...`);
     return promisify(wx.createBLEConnection, {
@@ -88,7 +87,7 @@ function _connectBlue() {
             return [null, res]
         },
         (err) => {
-            print(`x 连接蓝牙失败！${errToString(err)}`);
+            print(`✘ 连接蓝牙失败！${errToString(err)}`);
             return [errToString(err), null]
         }
     );
@@ -100,57 +99,77 @@ function _closeBLEConnection() {
         deviceId: this.deviceId,
     }).then(
         (res) => {
-            print(`✔ 断开蓝牙连接成功！`);
+            print(`✔ 断开蓝牙成功！`);
             return [null, res]
         },
         (err) => {
-            print(`x 断开蓝牙连接失败！${errToString(err)}`);
+            print(`✘ 断开蓝牙连接失败！${errToString(err)}`);
             return [errToString(err), null]
         }
     );
 }
 
-// 获取蓝牙特征值
+function _closeBLEAdapter() {
+    print(`释放蓝牙适配器...`)
+    return wx.closeBluetoothAdapter().then(res => {
+        print(`✔ 释放适配器成功！`)
+        return [null, res]
+    }, err => {
+        print(`✘ 释放适配器失败！${errToString(err)}`)
+        return [errToString(err), null]
+    })
+}
+
+function _getBLEServices() {
+    print(`获取蓝牙设备所有服务(service)`)
+    return promisify(wx.getBLEDeviceServices, {
+        deviceId: this.deviceId
+    }).then(res => {
+        print(`✔ 获取service成功！`)
+        return [null, res]
+    }, err => {
+        print(`✘ 获取service失败！${errToString(err)}`)
+        return [errToString(err), null]
+    })
+}
+
 function _getCharacteristics() {
     print(`开始获取特征值...`);
-    console.log("deviceid:", this.deviceId)
-    console.log("serviceId:", this.serviceId)
     return promisify(wx.getBLEDeviceCharacteristics, {
         deviceId: this.deviceId,
         serviceId: this.serviceId,
     }).then(
         (res) => {
             print(`✔ 获取特征值成功！`);
-            _handleCharacteristics.call(this, charact_res);
+            for (let i = 0; i < res.characteristics.length; i++) {
+                let item = res.characteristics[i];
+                if (item.properties.read) {
+                    this.readCharacteristicId = item.uuid;
+                    print(`readCharacteristicId:${item.uuid}`)
+                }
+                if (item.properties.write && !item.properties.read) {
+                    this.writeCharacteristicId = item.uuid;
+                    print(`writeCharacteristicId:${item.uuid}`)
+                }
+                if (item.properties.notify || item.properties.indicate) {
+                    this.notifyCharacteristicId = item.uuid;
+                    print(`notifyCharacteristicId:${item.uuid}`)
+                }
+            }
             return [null, res]
         },
         (err) => {
-            print(`x 获取特征值失败！${errToString(err)}`);
+            print(`✘ 获取特征值失败！${errToString(err)}`);
             return [errToString(errToString(err)), null]
         }
     );
 }
 
-//获取芯片对应蓝牙特征值 
-function _handleCharacteristics(res) {
-    for (let i = 0; i < res.characteristics.length; i++) {
-        let item = res.characteristics[i];
-        if (item.properties.read) {
-            this.readCharacteristicId = item.uuid;
-            print(`readCharacteristicId:${item.uuid}`)
-        }
-        if (item.properties.write && !item.properties.read) {
-            this.writeCharacteristicId = item.uuid;
-            print(`writeCharacteristicId:${item.uuid}`)
-        }
-        if (item.properties.notify || item.properties.indicate) {
-            this.notifyCharacteristicId = item.uuid;
-            print(`notifyCharacteristicId:${item.uuid}`)
-        }
-    }
-}
-
-
+/**
+ * 对微信接口的promise封装
+ * @param {function} fn 
+ * @param {object} args 
+ */
 function promisify(fn, args) {
     return new Promise((resolve, reject) => {
         fn({
@@ -160,6 +179,11 @@ function promisify(fn, args) {
         });
     });
 }
+
+/**
+ * 对微信接口回调函数的封装
+ * @param {function} fn 
+ */
 function promisify_callback(fn) {
     return new Promise((resolve, reject) => {
         fn(
@@ -181,7 +205,9 @@ export {
     print,
     _getCharacteristics,
     _connectBlue,
+    _getBLEServices,
     _closeBLEConnection,
+    _closeBLEAdapter,
     _stopSearchBluetooth,
     _onBluetoothFound,
     _startSearch,

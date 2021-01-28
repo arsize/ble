@@ -7,7 +7,8 @@ import BLEHandler from "./bleHandler"
  * 3.获取设备ID
  * 4.停止搜寻
  * 5.开始连接
- * 6.激活特征值
+ * 6.获取service
+ * 7.获取特征值
  */
 
 class BLE extends BLEHandler {
@@ -23,14 +24,17 @@ class BLE extends BLEHandler {
         await this.onBluetoothFound()
         // 停止搜索设备
         await this.stopSearchBluetooth()
-        // // 连接蓝牙
+        // 连接蓝牙
         await this.connectBlue();
-        // // 获取特征值
+        // 获取serviceId
+        await this.getBLEServices()
+        // 获取特征值
         await this.getCharacteristics();
     }
     async send() { }
     async close() {
         await this.closeBLEConnection()
+        await this.closeBLEAdapter()
 
     }
 }

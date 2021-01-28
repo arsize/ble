@@ -39,6 +39,12 @@ class BLEHandler {
             return;
         }
     }
+    async getBLEServices() {
+        let [err, res] = await t._getBLEServices.call(this);
+        if (err != null) {
+            return;
+        }
+    }
     async getCharacteristics() {
         let [err, res] = await t._getCharacteristics.call(this);
         if (err != null) {
@@ -47,6 +53,12 @@ class BLEHandler {
     }
     async closeBLEConnection() {
         let [err, res] = await t._closeBLEConnection.call(this);
+        if (err != null) {
+            return;
+        }
+    }
+    async closeBLEAdapter() {
+        let [err, res] = await t._closeBLEAdapter.call(this);
         if (err != null) {
             return;
         }
