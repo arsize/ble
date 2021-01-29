@@ -7,6 +7,7 @@ class BLE extends BLEHandler {
     async init() {
         // 蓝牙适配器初始化
         await this.openAdapter()
+
         // 搜索蓝牙设备
         await this.startSearch()
         // 获取设备ID
@@ -21,20 +22,26 @@ class BLE extends BLEHandler {
         await this.getCharacteristics();
         // 订阅特征值
         await this.notifyBLECharacteristicValueChange()
-
+        // 打开蓝牙适配器状态监听
+        this.onBLEConnectionStateChange()
         // 打开传输监听，等待设备反馈数据
         this.onBLECharacteristicValueChange()
 
 
     }
-    async send(cmd) {
 
+    async send(cmd) {
 
 
     }
     async close() {
         await this.closeBLEConnection()
         await this.closeBLEAdapter()
+    }
+    listen(event, callback) {
+        // 事件注册
+        this.emitter.removeAllListeners(event)
+        this.emitter.on(event, callback)
     }
 
 }

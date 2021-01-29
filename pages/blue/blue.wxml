@@ -1,0 +1,53 @@
+<view class="allContent" wx:if="{{connectStatus == ''}}">
+	<view class="blueconnectloading">
+		<view class="topblock">
+			<image style="width:320rpx;height:320rpx;" src="{{baseUrlImg + 'icon_bluetooth01@2x.png'}}" />
+		</view>
+		<view class="subText">当前电柜网络信号弱，请开启手机蓝牙。</view>
+	</view>
+	<view class="bottombar">
+		<view class="item left">
+			<view>取消</view>
+		</view>
+		<view bind:tap="startconnect" class="item right">
+			<view>继续</view>
+		</view>
+	</view>
+</view>
+<view class="allContent" wx:elif="{{connectStatus == 'isoff'}}">
+	<view class="blueconnectloading">
+		<view class="topblock">
+			<image style="width:320rpx;height:320rpx;" src="{{baseUrlImg + 'icon_bluetooth02@2x.png'}}" />
+		</view>
+		<view class="subText">
+			<view class="subTextTop">无法连接电柜</view>
+			<view class="subtitle">请尝试在手机设置中重启蓝牙</view>
+		</view>
+	</view>
+	<view class="bottombar2">
+		<text bind:tap="gotoblueinfopage" class="text" style="padding: 0 50rpx;">如何打开蓝牙？</text>
+		<view bind:tap="cancelMatch" class="cancelMatch">取消配对</view>
+	</view>
+</view>
+<view class="allContent" wx:elif="{{connectStatus == 'connecting'}}">
+	<view class="blueconnectloading">
+		<view class="topblock">
+			<image style="width:320rpx;height:320rpx;" src="{{baseUrlImg + 'blueconnect.gif'}}" />
+		</view>
+		<view class="subText">
+			<view class="subTextTop">蓝牙自动配对中...</view>
+			<view class="subtitle">请将手机贴近电柜</view>
+		</view>
+	</view>
+	<view class="bottombar2">
+		<view bind:tap="cancelMatch" class="cancelMatch">取消配对</view>
+	</view>
+</view>
+
+<view class="allContent" wx:elif="{{connectStatus == 'connected'}}">
+	<view class="blueconnectloading">
+		连接成功
+	</view>
+</view>
+<dialog></dialog>
+

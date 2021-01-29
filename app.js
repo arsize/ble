@@ -5,6 +5,7 @@ App({
     onLaunch() { },
     globalData: Object.assign(
         {
+            ble: "",//全局蓝牙实例
             bleStatus: false, //全局蓝牙状态
             emitter: emitter, //全局订阅函数
         },

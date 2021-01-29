@@ -1,0 +1,27 @@
+<view class="tap" bind:tap="gotoblue">蓝牙</view>
+
+<view class="blueline">
+	<view>当前蓝牙连接状态：</view>
+	<view>{{bleStatus}}</view>
+</view>
+
+<view class="bluespan">
+	<view>发送：</view>
+	<input
+	 class="weui-input"
+	 auto-focus
+	 placeholder="将会获取焦点"
+	/>
+	<view class="btn" bind:tap="writedata">发送</view>
+</view>
+
+<view class="bluespan" style="flex-direction: column;">
+	<view>响应：{{respond.length}}</view>
+	<view class="scrollline">
+		<view wx:for="{{respond}}">{{item}}</view>
+	</view>
+
+</view>
+
+<view class="tap2" bind:tap="closeblue">关闭</view>
+

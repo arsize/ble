@@ -1,5 +1,0 @@
-<view class="ble">
-	<view class="btn" bindtap="blueStart">点击连接蓝牙</view>
-
-</view>
-

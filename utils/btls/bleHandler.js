@@ -18,30 +18,31 @@ class BLEHandler {
     async openAdapter() {
         let [err, res] = await t._openAdapter.call(this);
         if (err != null) {
-
+            this.emitter.emit("connetc_status", "no_adapter")
             return;
         }
-        this.emitter.emit("index", "开启了适配器")
     }
     async startSearch() {
         let [err, res] = await t._startSearch.call(this);
         if (err != null) {
             return;
         }
-        this.emitter.emit("index", "开始搜suo")
+        this.emitter.emit("connetc_status", "connecting")
+
     }
     async onBluetoothFound() {
         let [err, res] = await t._onBluetoothFound.call(this);
         if (err != null) {
+            this.emitter.emit("connetc_status", "isoff")
             return;
         }
+
     }
     async stopSearchBluetooth() {
         let [err, res] = await t._stopSearchBluetooth.call(this);
         if (err != null) {
             return;
         }
-        this.emitter.emit("index", "正在停止搜索")
     }
     async connectBlue() {
         let [err, res] = await t._connectBlue.call(this);
@@ -60,6 +61,7 @@ class BLEHandler {
         if (err != null) {
             return;
         }
+        this.emitter.emit("connetc_status", "connected")
     }
     async notifyBLECharacteristicValueChange() {
         let [err, res] = await t._notifyBLECharacteristicValueChange.call(this);
@@ -79,12 +81,23 @@ class BLEHandler {
             return;
         }
     }
+    // 打开蓝牙适配器状态监听
+    onBLEConnectionStateChange() {
+        wx.onBLEConnectionStateChange(res => {
+            // 该方法回调中可以用于处理连接意外断开等异常情况
+            console.log('res', res)
+            if (!res.connected) {
+                this.emitter.emit("connetc_status", res.connected)
+
+            }
+
+        })
+    }
 
     // 收到设备推送的notification
     onBLECharacteristicValueChange() {
         wx.onBLECharacteristicValueChange(res => {
-            console.log('接受到数据', res)
-
+            this.emitter.emit("respond", res)
         })
     }
 }
