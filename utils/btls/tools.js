@@ -42,25 +42,42 @@ function _startSearch() {
  *@deviceId 设备ID
  */
 function _onBluetoothFound() {
-    print(`准备监听寻找到新设备的事件...`);
-    return promisify_callback(wx.onBluetoothDeviceFound).then(
-        (res) => {
-            let devices = res.devices
-            devices.forEach(element => {
-                if ((element.name && element.name == this.blename) || (element.localName && element.localName == this.blename)) {
-                    this.deviceId = element.deviceId
-                    console.log('this.deviceId', this.deviceId)
-                    return [null, res]
-                }
-            });
-            return ['找不到设备', null]
+    print(`监听搜寻新设备事件...`);
+    return _onBluetoothFound_promise.call(this).then(res => {
+        print(`✔ 设备ID找到成功!`);
+        return [null, res]
+    }, err => {
+        print(`✘ 设备ID找到失败!`);
+        return [errToString(err), null]
 
-        },
-        (err) => {
-            print(`✘ 获取deviceid失败！${errToString(err)}`);
-            return [errToString(err), null]
-        }
-    );
+    })
+}
+
+/**
+ * @param {Array} devices 查找到设备数组
+ * @param {int} count 计数器-嗅探2次
+ */
+function _onBluetoothFound_promise() {
+    let devices = []
+    let count = 0
+    return new Promise((resolve, reject) => {
+        wx.onBluetoothDeviceFound(res => {
+            devices.push(...res.devices)
+            count++
+            if (count > 1) {
+                devices.forEach(element => {
+                    if ((element.name && element.name == this.blename) || (element.localName && element.localName == this.blename)) {
+                        this.deviceId = element.deviceId
+                        resolve(res)
+                    }
+                });
+                reject('device not found')
+            }
+            print(`已嗅探蓝牙设备数：${devices.length}...`)
+        }, err => {
+            reject(err)
+        })
+    })
 }
 
 function _stopSearchBluetooth() {

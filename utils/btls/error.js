@@ -1,5 +1,6 @@
 export default function (err) {
     if (err && err.errCode) {
+        // 微信BLE蓝牙错误码
         switch (err.errCode) {
             case 10001:
                 return err.errCode + "：当前蓝牙适配器不可用"
@@ -27,7 +28,17 @@ export default function (err) {
                 return "蓝牙功能暂不支持"
         }
     } else {
-        return "蓝牙功能暂不支持"
+        // 自定义错误码
+        if (typeof err === 'string') {
+            switch (err) {
+                case 'device not found':
+                    return "找不到该设备"
+                default:
+                    break;
+            }
+        } else {
+            return "蓝牙功能暂不支持"
+        }
     }
 
 }

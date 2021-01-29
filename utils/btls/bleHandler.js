@@ -1,8 +1,14 @@
 import * as t from "./tools"
 
+/**
+ * 蓝牙工具类
+ * 封装小程序蓝牙流程方法
+ * 处理事件通信
+ */
 class BLEHandler {
-    constructor(blename) {
+    constructor(blename, emitter) {
         this.blename = blename
+        this.emitter = emitter
         this.readCharacteristicId = "";
         this.writeCharacteristicId = "";
         this.notifyCharacteristicId = "";
@@ -12,14 +18,17 @@ class BLEHandler {
     async openAdapter() {
         let [err, res] = await t._openAdapter.call(this);
         if (err != null) {
+
             return;
         }
+        this.emitter.emit("index", "开启了适配器")
     }
     async startSearch() {
         let [err, res] = await t._startSearch.call(this);
         if (err != null) {
             return;
         }
+        this.emitter.emit("index", "开始搜suo")
     }
     async onBluetoothFound() {
         let [err, res] = await t._onBluetoothFound.call(this);
@@ -32,6 +41,7 @@ class BLEHandler {
         if (err != null) {
             return;
         }
+        this.emitter.emit("index", "正在停止搜索")
     }
     async connectBlue() {
         let [err, res] = await t._connectBlue.call(this);
