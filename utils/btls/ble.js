@@ -5,7 +5,7 @@ class BLE extends BLEHandler {
         super(blename, emitter)
     }
     listen(event, callback) {
-        // 蓝牙事件注册
+        // 蓝牙事件注册,打开channel
         this.emitter.removeAllListeners(event)
         this.emitter.on(event, callback)
     }
