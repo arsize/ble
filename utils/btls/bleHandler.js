@@ -61,6 +61,12 @@ class BLEHandler {
             return;
         }
     }
+    async notifyBLECharacteristicValueChange() {
+        let [err, res] = await t._notifyBLECharacteristicValueChange.call(this);
+        if (err != null) {
+            return;
+        }
+    }
     async closeBLEConnection() {
         let [err, res] = await t._closeBLEConnection.call(this);
         if (err != null) {
@@ -72,6 +78,14 @@ class BLEHandler {
         if (err != null) {
             return;
         }
+    }
+
+    // 收到设备推送的notification
+    onBLECharacteristicValueChange() {
+        wx.onBLECharacteristicValueChange(res => {
+            console.log('接受到数据', res)
+
+        })
     }
 }
 export default BLEHandler

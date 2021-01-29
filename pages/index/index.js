@@ -9,19 +9,13 @@ Page({
     },
     onShow() {
         emitter.on("index", res => {
-            console.log('首页接收到：',res)
+            console.log('首页接收到：', res)
         })
     },
     blueStart() {
         ble.init()
-            .then((res) => { })
-            .catch((err) => {
-                console.log("err", err);
-            });
     },
     onHide() {
-        ble.close().then(res => {
-            console.log('close success')
-        })
+        ble.close()
     }
 });

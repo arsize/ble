@@ -182,6 +182,22 @@ function _getCharacteristics() {
     );
 }
 
+// 订阅特征值
+function _notifyBLECharacteristicValueChange() {
+    return promisify(wx.notifyBLECharacteristicValueChange, {
+        deviceId: this.deviceId,
+        serviceId: this.serviceId,
+        characteristicId: this.notifyCharacteristicId,
+        state: true
+    }).then(res => {
+        print(`✔ 订阅notify成功！`)
+        return [null, res]
+    }, err => {
+        print(`✘ 订阅notify失败！${errToString(err)}`)
+        return [errToString(err), null]
+    })
+}
+
 /**
  * 对微信接口的promise封装
  * @param {function} fn 
@@ -226,6 +242,7 @@ export {
     _closeBLEConnection,
     _closeBLEAdapter,
     _stopSearchBluetooth,
+    _notifyBLECharacteristicValueChange,
     _onBluetoothFound,
     _startSearch,
     _openAdapter,

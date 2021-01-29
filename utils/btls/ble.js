@@ -13,15 +13,25 @@ class BLE extends BLEHandler {
         await this.onBluetoothFound()
         // 停止搜索设备
         await this.stopSearchBluetooth()
-        // // 连接蓝牙
+        // 连接蓝牙
         await this.connectBlue();
         // 获取serviceId
         await this.getBLEServices()
-        // 获取特征值
+        // 设置特征值
         await this.getCharacteristics();
+        // 订阅特征值
+        await this.notifyBLECharacteristicValueChange()
+
+        // 打开传输监听，等待设备反馈数据
+        this.onBLECharacteristicValueChange()
+
 
     }
-    async send() { }
+    async send(cmd) {
+
+
+
+    }
     async close() {
         await this.closeBLEConnection()
         await this.closeBLEAdapter()
