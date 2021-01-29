@@ -18,7 +18,7 @@
 <view class="bluespan" style="flex-direction: column;">
 	<view>响应：{{respond.length}}</view>
 	<view class="scrollline">
-		<view wx:for="{{respond}}">{{item}}</view>
+		<view wx:for="{{respond}}" wx:key="index">{{item}}</view>
 	</view>
 
 </view>

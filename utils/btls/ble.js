@@ -4,6 +4,11 @@ class BLE extends BLEHandler {
     constructor(blename, emitter) {
         super(blename, emitter)
     }
+    listen(event, callback) {
+        // 蓝牙事件注册
+        this.emitter.removeAllListeners(event)
+        this.emitter.on(event, callback)
+    }
     async init() {
         // 蓝牙适配器初始化
         await this.openAdapter()
@@ -30,18 +35,13 @@ class BLE extends BLEHandler {
 
     }
 
-    async send(cmd) {
-
-
+    // 发送指令
+    async send(mudata, cmd) {
+        await this.sentOrder(mudata, cmd)
     }
     async close() {
         await this.closeBLEConnection()
         await this.closeBLEAdapter()
-    }
-    listen(event, callback) {
-        // 事件注册
-        this.emitter.removeAllListeners(event)
-        this.emitter.on(event, callback)
     }
 
 }

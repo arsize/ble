@@ -14,7 +14,7 @@
 		</view>
 	</view>
 </view>
-<view class="allContent" wx:elif="{{connectStatus == 'isoff'}}">
+<view class="allContent" wx:elif="{{connectStatus == '未找到设备'}}">
 	<view class="blueconnectloading">
 		<view class="topblock">
 			<image style="width:320rpx;height:320rpx;" src="{{baseUrlImg + 'icon_bluetooth02@2x.png'}}" />
@@ -29,7 +29,7 @@
 		<view bind:tap="cancelMatch" class="cancelMatch">取消配对</view>
 	</view>
 </view>
-<view class="allContent" wx:elif="{{connectStatus == 'connecting'}}">
+<view class="allContent" wx:elif="{{connectStatus == '正在连接中'}}">
 	<view class="blueconnectloading">
 		<view class="topblock">
 			<image style="width:320rpx;height:320rpx;" src="{{baseUrlImg + 'blueconnect.gif'}}" />
@@ -44,7 +44,7 @@
 	</view>
 </view>
 
-<view class="allContent" wx:elif="{{connectStatus == 'connected'}}">
+<view class="allContent" wx:elif="{{connectStatus == '蓝牙已连接'}}">
 	<view class="blueconnectloading">
 		连接成功
 	</view>

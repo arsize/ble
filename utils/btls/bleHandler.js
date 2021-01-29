@@ -18,7 +18,10 @@ class BLEHandler {
     async openAdapter() {
         let [err, res] = await t._openAdapter.call(this);
         if (err != null) {
-            this.emitter.emit("connetc_status", "no_adapter")
+            this.emitter.emit("channel", {
+                type: "connect",
+                data: "未打开适配器"
+            })
             return;
         }
     }
@@ -27,13 +30,19 @@ class BLEHandler {
         if (err != null) {
             return;
         }
-        this.emitter.emit("connetc_status", "connecting")
+        this.emitter.emit("channel", {
+            type: "connect",
+            data: "正在连接中"
+        })
 
     }
     async onBluetoothFound() {
         let [err, res] = await t._onBluetoothFound.call(this);
         if (err != null) {
-            this.emitter.emit("connetc_status", "isoff")
+            this.emitter.emit("channel", {
+                type: "connect",
+                data: "未找到设备"
+            })
             return;
         }
 
@@ -61,7 +70,10 @@ class BLEHandler {
         if (err != null) {
             return;
         }
-        this.emitter.emit("connetc_status", "connected")
+        this.emitter.emit("channel", {
+            type: "connect",
+            data: "蓝牙已连接"
+        })
     }
     async notifyBLECharacteristicValueChange() {
         let [err, res] = await t._notifyBLECharacteristicValueChange.call(this);
@@ -81,14 +93,23 @@ class BLEHandler {
             return;
         }
     }
+   async sentOrder(mudata, cmd) {
+        let data = t._sentOrder(mudata, cmd)
+        let [err, res] = await t._writeBLECharacteristicValue.call(this, data)
+        if (err != null) {
+            return
+        }
+    }
+
     // 打开蓝牙适配器状态监听
     onBLEConnectionStateChange() {
         wx.onBLEConnectionStateChange(res => {
             // 该方法回调中可以用于处理连接意外断开等异常情况
-            console.log('res', res)
             if (!res.connected) {
-                this.emitter.emit("connetc_status", res.connected)
-
+                this.emitter.emit("channel", {
+                    type: "connect",
+                    data: "蓝牙已断开"
+                })
             }
 
         })
@@ -97,7 +118,10 @@ class BLEHandler {
     // 收到设备推送的notification
     onBLECharacteristicValueChange() {
         wx.onBLECharacteristicValueChange(res => {
-            this.emitter.emit("respond", res)
+            this.emitter.emit("channel", {
+                type: "response",
+                data: res
+            })
         })
     }
 }

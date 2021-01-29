@@ -1,5 +1,5 @@
 const app = getApp();
-
+const emitter = app.globalData.emitter
 Page({
     data: {
         bleStatus: "",
@@ -9,17 +9,7 @@ Page({
         this.setData({
             bleStatus: app.globalData.bleStatus
         })
-        if (app.globalData.ble) {
-            app.globalData.ble.listen("respond", res => {
-                console.log('接收到数据')
-                let temp = this.data.respond
-                temp.push(this.ab2hex(res.value))
-                this.setData({
-                    respond: temp
-                })
-            })
-        }
-
+        this.watchBLE()
     },
     gotoblue() {
         wx.navigateTo({
@@ -34,6 +24,12 @@ Page({
         setTimeout(() => {
             wx.hideLoading()
         }, 1000);
+        app.globalData.bleStatus = false
+        this.setData({
+            bleStatus: false,
+            respond: []
+        })
+
     },
     writedata() {
         wx.showLoading({
@@ -42,7 +38,7 @@ Page({
         setTimeout(() => {
             wx.hideLoading()
         }, 1000);
-
+        app.globalData.ble.send([0x00], 0x01)
     },
     ab2hex(buffer) {
         let hexArr = Array.prototype.map.call(
@@ -52,5 +48,19 @@ Page({
             }
         )
         return hexArr.join('');
+    },
+    watchBLE() {
+        if (app.globalData.ble) {
+            app.globalData.ble.listen("channel", res => {
+                if (res.type == 'response') {
+                    let temp = this.data.respond
+                    temp.push(this.ab2hex(res.data.value))
+                    this.setData({
+                        respond: temp
+                    })
+                }
+
+            })
+        }
     }
 });
