@@ -177,7 +177,7 @@ function _getCharacteristics() {
         },
         (err) => {
             print(`✘ 获取特征值失败！${errToString(err)}`);
-            return [errToString(errToString(err)), null]
+            return [errToString(err), null]
         }
     );
 }
@@ -204,7 +204,7 @@ function _notifyBLECharacteristicValueChange() {
  */
 function _sentOrder(mudata, cmd) {
     print(`开始封装指令...`)
-    let uarr = new Uint8Array(mudata.length + 8)
+    let uarr = new Array(mudata.length + 8)
     uarr[0] = 0xEE //帧头
     uarr[1] = 0xFA //帧头
     uarr[2] = mudata.length + 1
@@ -212,28 +212,13 @@ function _sentOrder(mudata, cmd) {
     mudata.map((item, index) => {
         uarr[index + 4] = item
     })
-    let crc = _modBusCRC16(uarr, 1, mudata.length + 2)
+    let crc = _modBusCRC16(uarr, 2, mudata.length + 3)
     uarr[uarr.length - 4] = (crc >> 8) & 0xff
     uarr[uarr.length - 3] = crc & 0xff
     uarr[uarr.length - 2] = 0xFC //帧尾
     uarr[uarr.length - 1] = 0xFF //帧尾
     print(`✔ 封装成功!${uarr}`)
     return uarr
-}
-
-function _writeBLECharacteristicValue(mudata) {
-    return promisify(wx.writeBLECharacteristicValue, {
-        deviceId: this.deviceId,
-        serviceId: this.serviceId,
-        characteristicId: this.writeCharacteristicId,
-        value: mudata.buffer,
-    }).then(res => {
-        print(`✔ 写入数据成功！`)
-        return [null, res]
-    }, err => {
-        print(`✘ 写入数据失败！${errToString(err)}`)
-        return [errToString(err), null]
-    })
 }
 
 // CRC16 校验算法
@@ -257,7 +242,20 @@ function _modBusCRC16(data, startIdx, endIdx) {
     return ((crc << 8) | (crc >> 8)) & 0xffff;
 }
 
-
+function _writeBLECharacteristicValue(mudata) {
+    return promisify(wx.writeBLECharacteristicValue, {
+        deviceId: this.deviceId,
+        serviceId: this.serviceId,
+        characteristicId: this.writeCharacteristicId,
+        value: mudata,
+    }).then(res => {
+        print(`✔ 写入数据成功！`)
+        return [null, res]
+    }, err => {
+        print(`✘ 写入数据失败！${errToString(err)}`)
+        return [errToString(err), null]
+    })
+}
 
 /**
  * 对微信接口的promise封装
@@ -309,6 +307,7 @@ export {
     _openAdapter,
     _sentOrder,
     _writeBLECharacteristicValue,
+    _modBusCRC16,
     promisify,
     promisify_callback,
 };
