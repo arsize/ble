@@ -18,4 +18,4 @@ pass
 
 ### 流程图
 
-![蓝牙流程图](./flow.png)
+![蓝牙流程图](http://arsizes.com/img/flow.png)
