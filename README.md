@@ -1,6 +1,9 @@
 为了简化微信小程序环境下的蓝牙接入流程，经过线上正式项目一年的运行，发现BLE这块API许多坑，且难以移植复用，所以将它封装出来提高可维护性以及可移植性。
 ### 如何使用
 #### 安装Eventenitter
+```
+npm install eventemitter2 --save
+```
 
 ### 引入 
 在项目根目录utils文件夹下添加如下文件：ble.js、bleHandler.js、tools.js、error.js
