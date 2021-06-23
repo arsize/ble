@@ -14,7 +14,7 @@ class BLEHandler {
         this.writeCharacteristicId = "";
         this.notifyCharacteristicId = "";
         this.deviceId = "";
-        this.serviceId = "6xx";
+        this.serviceId = "6xx";//具体的serviceId要自己根据硬件提供设置
     }
     async openAdapter() {
         let [err, res] = await t._openAdapter.call(this);
